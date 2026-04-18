@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ética Pública — UCV Posgrado</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --verde: #0F6E56; --verde-light: #1D9E75; --verde-bg: #E1F5EE; --verde-mid: #5DCAA5;
+  --amber: #854F0B; --amber-bg: #FAEEDA;
+  --coral: #993C1D; --coral-bg: #FAECE7;
+  --blue: #185FA5; --blue-bg: #E6F1FB;
+  --purple: #534AB7; --purple-bg: #EEEDFE;
+  --red: #A32D2D; --red-bg: #FCEBEB;
+  --text: #1a1a1a; --text-sec: #555;
+  --border: #e0e0d8; --surface: #f8f7f2; --white: #fff;
+  --radius: 14px; --radius-sm: 8px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.6; }
+
+/* TOP BAR */
+.top-bar { background: var(--verde); color: white; padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+.top-bar-title { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 600; }
+.top-bar-right { display: flex; align-items: center; gap: 8px; }
+.top-badge { background: rgba(255,255,255,0.15); font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+.docente-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; font-size: 11px; padding: 4px 10px; border-radius: 20px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: background 0.15s; }
+.docente-btn:hover { background: rgba(255,255,255,0.3); }
+
+/* PROGRESS */
+.progress-bar { height: 3px; background: #d0ece3; }
+.progress-fill { height: 100%; background: var(--verde-light); transition: width 0.4s ease; }
+
+/* CONTAINER */
+.container { max-width: 640px; margin: 0 auto; padding: 24px 20px 60px; }
+.screen { display: none; }
+.screen.active { display: block; animation: fadeUp 0.3s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+
+/* TYPOGRAPHY */
+.display-title { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; line-height: 1.25; color: var(--verde); margin-bottom: 10px; }
+.subtitle { font-size: 14px; color: var(--text-sec); line-height: 1.6; margin-bottom: 24px; }
+.section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-sec); margin-bottom: 10px; }
+
+/* ROLE GRID */
+.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 28px; }
+.role-card { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; transition: all 0.18s; text-align: left; }
+.role-card:hover { border-color: var(--verde-mid); background: var(--verde-bg); }
+.role-card.selected { border-color: var(--verde); background: var(--verde-bg); box-shadow: 0 0 0 3px rgba(29,158,117,0.15); }
+.role-icon { font-size: 22px; margin-bottom: 6px; display: block; }
+.role-name { font-size: 13px; font-weight: 500; }
+.role-desc-short { font-size: 11px; color: var(--text-sec); margin-top: 2px; }
+
+/* INPUTS */
+.name-input, .reflexion-area, .pass-input {
+  width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  padding: 12px 14px; font-size: 15px; font-family: 'DM Sans', sans-serif;
+  background: var(--white); color: var(--text); outline: none; transition: border-color 0.15s;
+}
+.name-input:focus, .reflexion-area:focus, .pass-input:focus { border-color: var(--verde); }
+.name-input { margin-bottom: 20px; }
+.reflexion-area { min-height: 100px; resize: vertical; margin-bottom: 14px; line-height: 1.6; }
+.pass-input { margin-bottom: 12px; letter-spacing: 0.1em; }
+
+/* DILEMA LIST */
+.dilema-list { margin-bottom: 28px; }
+.dilema-item { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 12px; }
+.dilema-item:hover { border-color: var(--verde-mid); }
+.dilema-item.selected { border-color: var(--verde); background: var(--verde-bg); }
+.dilema-num-bubble { background: var(--verde-bg); color: var(--verde); border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; transition: background 0.18s; }
+.dilema-item.selected .dilema-num-bubble { background: var(--verde); color: white; }
+.dilema-item-title { font-size: 14px; font-weight: 500; }
+.dilema-item-hint { font-size: 12px; color: var(--text-sec); margin-top: 2px; }
+
+/* BUTTONS */
+.btn-primary { background: var(--verde); color: white; border: none; border-radius: var(--radius-sm); padding: 13px 24px; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; width: 100%; transition: background 0.15s, transform 0.1s; }
+.btn-primary:hover { background: var(--verde-light); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled { background: #b0c9bf; cursor: not-allowed; }
+.btn-danger { background: var(--red); color: white; border: none; border-radius: var(--radius-sm); padding: 10px 18px; font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: opacity 0.15s; }
+.btn-danger:hover { opacity: 0.85; }
+.btn-sm { background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 14px; font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; color: var(--text-sec); transition: all 0.15s; }
+.btn-sm:hover { background: var(--verde-bg); border-color: var(--verde-mid); color: var(--verde); }
+
+/* DILEMA BOX */
+.dilema-box { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+.dilema-box-header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.dilema-box-num { background: var(--verde); color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+.dilema-box-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; color: var(--verde); }
+.dilema-box-text { font-size: 13.5px; line-height: 1.75; color: var(--text); margin-bottom: 14px; }
+.tension-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-size: 11px; padding: 3px 9px; border-radius: 12px; font-weight: 500; }
+.tag-amber { background: var(--amber-bg); color: var(--amber); }
+.tag-coral { background: var(--coral-bg); color: var(--coral); }
+.tag-blue  { background: var(--blue-bg);  color: var(--blue); }
+.tag-purple{ background: var(--purple-bg); color: var(--purple); }
+.tag-teal  { background: var(--verde-bg); color: var(--verde); }
+
+/* ROL BADGE */
+.rol-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--verde-bg); color: var(--verde); font-size: 12px; font-weight: 500; padding: 5px 12px; border-radius: 20px; margin-bottom: 16px; }
+
+/* PREGUNTA GUIA */
+.pregunta-guia { background: #f0faf5; border-left: 3px solid var(--verde-mid); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; padding: 10px 14px; font-size: 13px; color: var(--text-sec); margin-bottom: 20px; line-height: 1.6; }
+
+/* OPCIONES VOTO */
+.opciones-title { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.opciones-hint { font-size: 13px; color: var(--text-sec); margin-bottom: 16px; }
+.opcion-btn { display: flex; align-items: flex-start; width: 100%; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; cursor: pointer; text-align: left; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); transition: all 0.18s; line-height: 1.5; gap: 10px; }
+.opcion-btn:hover { border-color: var(--verde-mid); background: var(--verde-bg); }
+.opcion-btn.voted { border-color: var(--verde); background: var(--verde-bg); color: var(--verde); font-weight: 500; }
+.opcion-letter { display: inline-flex; align-items: center; justify-content: center; background: var(--verde-bg); color: var(--verde); border-radius: 4px; min-width: 22px; height: 22px; font-size: 12px; font-weight: 600; flex-shrink: 0; margin-top: 1px; }
+.opcion-btn.voted .opcion-letter { background: var(--verde); color: white; }
+
+/* RESULTADOS */
+.result-bar-wrap { margin-bottom: 14px; }
+.result-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; align-items: flex-start; gap: 8px; }
+.result-label-text { color: var(--text); line-height: 1.4; flex: 1; }
+.result-pct { color: var(--verde); font-weight: 500; white-space: nowrap; }
+.result-bar-track { background: #e8ede9; border-radius: 4px; height: 8px; overflow: hidden; }
+.result-bar-fill { background: var(--verde-light); height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+.result-count { font-size: 11px; color: var(--text-sec); margin-top: 3px; }
+.result-winner { background: var(--verde-bg); border: 1px solid var(--verde-mid); border-radius: var(--radius-sm); padding: 2px 8px; font-size: 10px; color: var(--verde); font-weight: 600; margin-left: 6px; white-space: nowrap; }
+
+.total-votes { background: var(--verde-bg); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 13px; color: var(--verde); font-weight: 500; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+.pulse-dot { width: 8px; height: 8px; background: var(--verde-light); border-radius: 50%; animation: pulse 1.5s infinite; flex-shrink: 0; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.5;transform:scale(0.8);} }
+
+/* INFO ROW */
+.info-row { display: flex; gap: 8px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 8px; font-size: 13px; }
+.info-key { color: var(--text-sec); min-width: 80px; flex-shrink: 0; }
+.info-val { font-weight: 500; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+/* COMPLETADO */
+.completado-circle { width: 64px; height: 64px; background: var(--verde-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 20px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--verde); color: white; padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 500; transition: transform 0.3s ease; z-index: 200; white-space: nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ============ PANEL DOCENTE ============ */
+.panel-docente { display: none; min-height: 100vh; background: #f0f4f8; }
+.panel-docente.active { display: block; }
+
+.panel-header { background: #1a2e3b; color: white; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+.panel-header-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; }
+.panel-header-sub { font-size: 12px; opacity: 0.6; margin-top: 2px; }
+.panel-close-btn { background: rgba(255,255,255,0.15); border: none; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+.panel-close-btn:hover { background: rgba(255,255,255,0.25); }
+
+.panel-body { max-width: 900px; margin: 0 auto; padding: 28px 20px 60px; }
+
+/* STATS ROW */
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 28px; }
+.stat-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: center; }
+.stat-num { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 700; color: var(--verde); line-height: 1; margin-bottom: 4px; }
+.stat-label { font-size: 12px; color: var(--text-sec); }
+
+/* DILEMA TABS */
+.dilema-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 20px; }
+.dtab { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 14px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--text-sec); transition: all 0.15s; }
+.dtab:hover { background: var(--verde-bg); }
+.dtab.active { background: var(--verde); color: white; border-color: var(--verde); font-weight: 500; }
+
+/* PANEL CARD */
+.p-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+.p-card-title { font-family: 'Fraunces', serif; font-size: 16px; font-weight: 600; color: var(--verde); margin-bottom: 4px; }
+.p-card-sub { font-size: 12px; color: var(--text-sec); margin-bottom: 16px; }
+
+/* REFLEXION CARDS */
+.reflexion-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px; }
+.ref-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.ref-name { font-size: 13px; font-weight: 500; }
+.ref-rol { font-size: 11px; background: var(--verde-bg); color: var(--verde); padding: 2px 8px; border-radius: 12px; font-weight: 500; }
+.ref-opcion { font-size: 11px; background: var(--amber-bg); color: var(--amber); padding: 2px 8px; border-radius: 12px; font-weight: 500; }
+.ref-text { font-size: 13px; color: var(--text-sec); line-height: 1.6; font-style: italic; }
+
+/* FILTROS */
+.filtros-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+.filtro-label { font-size: 12px; color: var(--text-sec); }
+.filtro-select { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 5px 10px; font-size: 12px; font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--text); outline: none; cursor: pointer; }
+
+/* EXPORT AREA */
+.export-area { background: #1a2e3b; color: #a8c5b5; border-radius: var(--radius-sm); padding: 14px; font-family: monospace; font-size: 12px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto; margin-bottom: 12px; }
+
+/* MODAL OVERLAY */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 300; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal-box { background: var(--white); border-radius: var(--radius); padding: 28px; max-width: 360px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+.modal-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: var(--verde); margin-bottom: 8px; }
+.modal-sub { font-size: 13px; color: var(--text-sec); margin-bottom: 20px; line-height: 1.6; }
+.modal-error { font-size: 12px; color: var(--red); margin-bottom: 10px; min-height: 18px; }
+.modal-actions { display: flex; gap: 8px; }
+.modal-cancel { flex: 1; background: transparent; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--text-sec); }
+.modal-ok { flex: 2; background: var(--verde); color: white; border: none; border-radius: var(--radius-sm); padding: 10px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; }
+.modal-ok:hover { background: var(--verde-light); }
+
+/* REFRESH BTN */
+.refresh-btn { display: flex; align-items: center; gap: 6px; background: var(--verde-bg); border: 1px solid var(--verde-mid); color: var(--verde); border-radius: var(--radius-sm); padding: 6px 14px; font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all 0.15s; }
+.refresh-btn:hover { background: var(--verde); color: white; }
+
+/* EMPTY STATE */
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-sec); font-size: 14px; }
+.empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+/* HIGHLIGHT GANADOR */
+.result-bar-fill.winner { background: #0F6E56; }
+.result-bar-track.winner-track { background: #c5e8d9; }
+</style>
+</head>
+<body>
+
+<!-- ======= TOP BAR ======= -->
+<div class="top-bar" id="topBar">
+  <span class="top-bar-title">Ética en la Gestión Pública</span>
+  <div class="top-bar-right">
+    <span class="top-badge">UCV Posgrado</span>
+    <button class="docente-btn" onclick="abrirModalDocente()">Panel docente</button>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+<!-- ======= VISTA ESTUDIANTE ======= -->
+<div id="vistaEstudiante">
+<div class="container">
+
+  <!-- S1: BIENVENIDA -->
+  <div class="screen active" id="screen-1">
+    <div style="text-align:center;margin:20px 0 28px;">
+      <div style="font-size:40px;margin-bottom:12px;">⚖️</div>
+      <h1 class="display-title">Dilemas Éticos<br>en la Función Pública</h1>
+      <p class="subtitle">Sesión interactiva de posgrado. Elige tu rol, analiza el dilema y emite tu voto argumentado.</p>
+    </div>
+    <p class="section-label">Tu nombre o alias</p>
+    <input class="name-input" type="text" id="inputNombre" placeholder="Ej: Carlos M. / Participante 5" maxlength="40">
+    <button class="btn-primary" onclick="irA2()">Comenzar →</button>
+  </div>
+
+  <!-- S2: ROL -->
+  <div class="screen" id="screen-2">
+    <h2 class="display-title">Elige tu rol</h2>
+    <p class="subtitle">Analizarás el dilema exclusivamente desde esta perspectiva.</p>
+    <div class="role-grid" id="roleGrid"></div>
+    <button class="btn-primary" id="btnRol" onclick="irA3()" disabled>Confirmar rol →</button>
+  </div>
+
+  <!-- S3: DILEMA -->
+  <div class="screen" id="screen-3">
+    <h2 class="display-title">Elige el dilema</h2>
+    <p class="subtitle">Selecciona el caso que tu facilitador indicó para esta sesión.</p>
+    <div class="dilema-list" id="dilemaList"></div>
+    <button class="btn-primary" id="btnDilema" onclick="irA4()" disabled>Analizar dilema →</button>
+  </div>
+
+  <!-- S4: VOTO -->
+  <div class="screen" id="screen-4">
+    <div class="rol-badge" id="rolBadgeActivo"></div>
+    <div class="dilema-box" id="dilemaBoxActivo"></div>
+    <p class="section-label">Tu perspectiva desde el rol</p>
+    <div class="pregunta-guia" id="preguntaGuia"></div>
+    <p class="opciones-title">¿Qué decisión tomarías?</p>
+    <p class="opciones-hint">Selecciona la opción que mejor refleja tu postura desde tu rol asignado.</p>
+    <div id="opcionesVoto"></div>
+    <div style="margin-top:8px;"><button class="btn-primary" id="btnVotar" onclick="emitirVoto()" disabled>Emitir voto →</button></div>
+  </div>
+
+  <!-- S5: RESULTADOS + REFLEXIÓN -->
+  <div class="screen" id="screen-5">
+    <h2 class="display-title">Tu voto fue registrado</h2>
+    <p class="subtitle">Ahora comparte el argumento detrás de tu decisión.</p>
+    <div class="total-votes"><div class="pulse-dot"></div><span id="totalVotesText">Cargando...</span></div>
+    <p class="section-label">Resultados en tiempo real</p>
+    <div id="resultadosBarras"></div>
+    <hr class="divider">
+    <p class="section-label">Tu argumento (reflexión individual)</p>
+    <textarea class="reflexion-area" id="reflexionText" placeholder="Desde mi rol como [rol], considero que la decisión correcta es... porque..."></textarea>
+    <button class="btn-primary" onclick="enviarReflexion()">Enviar reflexión →</button>
+  </div>
+
+  <!-- S6: COMPLETADO -->
+  <div class="screen" id="screen-6">
+    <div style="text-align:center;padding:20px 0;">
+      <div class="completado-circle">✓</div>
+      <h2 class="display-title">¡Participación completa!</h2>
+      <p class="subtitle" style="margin-bottom:28px;">Tu voto y reflexión fueron registrados. El facilitador compartirá el consolidado en la plenaria.</p>
+    </div>
+    <p class="section-label">Resumen de tu participación</p>
+    <div id="resumenParticipacion"></div>
+    <hr class="divider">
+    <p class="section-label">Resultados finales del grupo</p>
+    <div class="total-votes"><div class="pulse-dot"></div><span id="totalVotesFinalText">Actualizando...</span></div>
+    <div id="resultadosFinales"></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ======= PANEL DOCENTE ======= -->
+<div class="panel-docente" id="panelDocente">
+  <div class="panel-header">
+    <div>
+      <div class="panel-header-title">Panel del Docente</div>
+      <div class="panel-header-sub">Vista en tiempo real · UCV Posgrado · Ética Pública</div>
+    </div>
+    <button class="panel-close-btn" onclick="cerrarPanelDocente()">← Volver a la sesión</button>
+  </div>
+
+  <div class="panel-body">
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="statParticipantes">0</div><div class="stat-label">Participantes</div></div>
+      <div class="stat-card"><div class="stat-num" id="statVotos">0</div><div class="stat-label">Votos emitidos</div></div>
+      <div class="stat-card"><div class="stat-num" id="statReflexiones">0</div><div class="stat-label">Reflexiones</div></div>
+      <div class="stat-card"><div class="stat-num" id="statDilemaActivo">—</div><div class="stat-label">Dilema más votado</div></div>
+    </div>
+
+    <!-- ACCIONES -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;align-items:center;">
+      <button class="refresh-btn" onclick="actualizarPanel()">↻ Actualizar datos</button>
+      <button class="btn-sm" onclick="resetearSesion()">Limpiar sesión</button>
+      <button class="btn-sm" onclick="mostrarExport()">Exportar texto</button>
+    </div>
+
+    <!-- DILEMA TABS -->
+    <p class="section-label">Ver por dilema</p>
+    <div class="dilema-tabs" id="dilemaTabs"></div>
+
+    <!-- VOTOS DEL DILEMA -->
+    <div class="p-card" id="cardVotos">
+      <div class="p-card-title" id="panelDilemaTitle">Selecciona un dilema</div>
+      <div class="p-card-sub" id="panelDilemaSub"></div>
+      <div id="panelResultBars"></div>
+    </div>
+
+    <!-- FILTROS REFLEXIONES -->
+    <div class="filtros-row">
+      <span class="filtro-label">Filtrar reflexiones por:</span>
+      <select class="filtro-select" id="filtroRol" onchange="renderReflexiones()">
+        <option value="">Todos los roles</option>
+      </select>
+      <select class="filtro-select" id="filtroOpcion" onchange="renderReflexiones()">
+        <option value="">Todas las opciones</option>
+        <option value="0">Opción A</option>
+        <option value="1">Opción B</option>
+        <option value="2">Opción C</option>
+        <option value="3">Opción D</option>
+      </select>
+    </div>
+
+    <!-- REFLEXIONES -->
+    <div class="p-card">
+      <div class="p-card-title">Reflexiones de los participantes</div>
+      <div class="p-card-sub" id="reflexionesSub">—</div>
+      <div id="panelReflexiones"></div>
+    </div>
+
+    <!-- EXPORT (oculto por defecto) -->
+    <div class="p-card" id="exportCard" style="display:none;">
+      <div class="p-card-title">Exportar datos de la sesión</div>
+      <div class="p-card-sub">Copia este texto para guardar los resultados.</div>
+      <div class="export-area" id="exportArea"></div>
+      <button class="btn-sm" onclick="copiarExport()">Copiar al portapapeles</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ======= MODAL ACCESO DOCENTE ======= -->
+<div class="modal-overlay" id="modalDocente" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-title">Acceso docente</div>
+    <div class="modal-sub">Ingresa la contraseña para acceder al panel de seguimiento de la sesión.</div>
+    <input class="pass-input" type="password" id="passInput" placeholder="Contraseña" maxlength="30">
+    <div class="modal-error" id="passError"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="cerrarModal()">Cancelar</button>
+      <button class="modal-ok" onclick="verificarPass()">Ingresar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// =============================================
+// DATOS
+// =============================================
+const PASS_DOCENTE = 'ucv2025';
+
+const roles = [
+  { nombre: "Servidor operativo",    icono: "📋", desc: "Técnico / analista / asistente" },
+  { nombre: "Directivo intermedio",  icono: "📊", desc: "Jefe de área / coordinador" },
+  { nombre: "Alta dirección",        icono: "🏛️", desc: "Titular / gerente regional" },
+  { nombre: "Ciudadano / usuario",   icono: "👤", desc: "Receptor del servicio público" },
+  { nombre: "Órgano de control (OCI)", icono: "🔍", desc: "Auditor / controlador interno" },
+  { nombre: "Defensor / abogado",    icono: "⚖️", desc: "Asesor legal / defensor" }
+];
+
+const dilemas = [
+  {
+    id: "d1", titulo: "El contrato con urgencia", num: 1,
+    contexto: "Un director regional de salud recibe instrucciones de su superior para contratar directamente a una empresa de suministros médicos, alegando emergencia, aunque hay procesos regulares activos. La empresa pertenece a un familiar del funcionario jerárquico.",
+    tensiones: [{t:"Lealtad jerárquica",c:"amber"},{t:"Integridad institucional",c:"blue"},{t:"Conflicto de intereses",c:"coral"},{t:"Urgencia vs legalidad",c:"purple"}],
+    preguntasPorRol: [
+      "Como servidor operativo: ¿firmarías los documentos que te piden? ¿Qué herramienta legal usarías para protegerte?",
+      "Como directivo intermedio: ¿cómo gestionas la instrucción de tu superior sin comprometer tu responsabilidad?",
+      "Como alta dirección: ¿qué sistemas preventivos deberías tener para evitar este escenario?",
+      "Como ciudadano: ¿qué impacto tiene en los servicios de salud que recibes si este contrato se concreta?",
+      "Como OCI: ¿qué indicadores de alerta identificas y qué acciones de control activarías?",
+      "Como abogado público: ¿qué normas de la Ley N° 30225 y el Código de Ética son aplicables?"
+    ],
+    opciones: [
+      "Ejecutar la instrucción: la emergencia justifica el procedimiento directo.",
+      "Solicitar por escrito la justificación técnica y legal antes de proceder.",
+      "Abstenerme y reportar al OCI el posible conflicto de intereses antes de actuar.",
+      "Proponer un proceso abreviado que cumpla la norma sin generar riesgo legal."
+    ]
+  },
+  {
+    id: "d2", titulo: "El expediente que desaparece", num: 2,
+    contexto: "Una servidora del archivo central detecta que un expediente de adjudicación de terrenos fue extraído y no figura en el sistema. Su jefa le pide no registrar la incidencia, sugiriendo que fue 'un error de sistema'.",
+    tensiones: [{t:"Presión de superiores",c:"coral"},{t:"Custodia documental",c:"blue"},{t:"Encubrimiento",c:"amber"},{t:"Transparencia pública",c:"teal"}],
+    preguntasPorRol: [
+      "Como servidor operativo: ¿obedeces a tu jefa o registras la incidencia? ¿Cómo te proteges legalmente?",
+      "Como directivo intermedio: ¿qué protocolos de control documental deberías haber implementado?",
+      "Como alta dirección: ¿cómo reconstruyes la confianza institucional y evitas que esto se repita?",
+      "Como ciudadano: ¿cómo afecta la pérdida de este expediente tu derecho de acceso a la información?",
+      "Como OCI: ¿qué procedimiento de auditoría documental activas ante esta irregularidad?",
+      "Como abogado público: ¿qué delitos podrían configurarse y qué normas del Sistema Nacional de Archivos aplican?"
+    ],
+    opciones: [
+      "Seguir la indicación de la jefa: puede ser realmente un error del sistema.",
+      "Registrar la incidencia en el sistema y notificar a TI sin escalar aún.",
+      "Documentar todo y denunciar directamente ante el OCI o el Ministerio Público.",
+      "Hablar primero con la jefa para entender el contexto antes de actuar."
+    ]
+  },
+  {
+    id: "d3", titulo: "El presupuesto reasignado", num: 3,
+    contexto: "Un jefe de planificación detecta que el titular regional reasignó presupuesto de agua potable rural hacia gastos de representación, mediante modificaciones sucesivas que individualmente no superan los umbrales del MEF.",
+    tensiones: [{t:"Mandato social",c:"teal"},{t:"Discrecionalidad ejecutiva",c:"purple"},{t:"Derechos comunitarios",c:"blue"},{t:"Control presupuestario",c:"amber"}],
+    preguntasPorRol: [
+      "Como servidor operativo: ¿firmas las modificaciones presupuestarias que te presentan para visar?",
+      "Como directivo intermedio: ¿cómo alertas al titular sin comprometer tu cargo ni tus funciones?",
+      "Como alta dirección: ¿cómo justificarías esta decisión ante la CGR y ante la comunidad afectada?",
+      "Como ciudadano de la zona rural: ¿qué mecanismos de participación o denuncia tienes disponibles?",
+      "Como OCI: ¿cómo identificas el fraccionamiento y qué acción de control implementas?",
+      "Como abogado público: ¿qué infracciones a la Ley General de Presupuesto Público configura esta conducta?"
+    ],
+    opciones: [
+      "Ejecutar las modificaciones: son técnicamente válidas individualmente.",
+      "Alertar por escrito al titular sobre el riesgo legal de la reasignación acumulada.",
+      "Denunciar el fraccionamiento ante la CGR como práctica evasiva de control.",
+      "Proponer una audiencia pública con la comunidad afectada antes de ejecutar los cambios."
+    ]
+  },
+  {
+    id: "d4", titulo: "La selección dirigida", num: 4,
+    contexto: "El responsable de RRHH recibe presión del jefe de gabinete para favorecer a un candidato en un concurso CAS. Se le entrega el perfil ajustado al candidato y se le pide conducir la entrevista de forma favorable.",
+    tensiones: [{t:"Meritocracia",c:"blue"},{t:"Presión política",c:"coral"},{t:"Igualdad de oportunidades",c:"teal"},{t:"Lealtad vs ética",c:"amber"}],
+    preguntasPorRol: [
+      "Como servidor operativo de RRHH: ¿aplicas la entrevista de forma favorable o te niegas?",
+      "Como directivo intermedio: ¿qué haces cuando recibes esta instrucción del jefe de gabinete?",
+      "Como alta dirección: ¿qué responsabilidad tienes si el proceso irregular prospera bajo tu conducción?",
+      "Como ciudadano postulante afectado: ¿qué recursos impugnativos tienes disponibles?",
+      "Como OCI: ¿cómo detectas la irregularidad en el expediente de selección y qué acción tomas?",
+      "Como abogado público: ¿qué sanciones del Código de Ética y la Ley N° 30057 son aplicables?"
+    ],
+    opciones: [
+      "Seguir la instrucción: el jefe de gabinete tiene autoridad y el candidato puede ser idóneo.",
+      "Aplicar el proceso con total imparcialidad y documentar la presión recibida.",
+      "Solicitar la anulación del proceso e iniciar uno nuevo con mayor transparencia.",
+      "Denunciar la presión ante SERVIR o el OCI antes de continuar con la entrevista."
+    ]
+  },
+  {
+    id: "d5", titulo: "La información privilegiada", num: 5,
+    contexto: "Un funcionario del MEF con acceso a proyecciones macroeconómicas no publicadas comenta informalmente con su cónyuge datos que podrían usarse para decisiones de inversión. No hay intención expresa de lucro.",
+    tensiones: [{t:"Confidencialidad",c:"purple"},{t:"Confianza institucional",c:"blue"},{t:"Entorno familiar",c:"amber"},{t:"Uso indebido de info",c:"coral"}],
+    preguntasPorRol: [
+      "Como servidor operativo: ¿comentarías información sensible con tu familia asumiendo que no hay daño directo?",
+      "Como directivo intermedio: ¿cómo capacitas a tu equipo para prevenir filtraciones informales?",
+      "Como alta dirección: ¿qué protocolos de confidencialidad implementas ante este caso?",
+      "Como ciudadano: ¿cómo te afecta que información económica privilegiada circule fuera del Estado?",
+      "Como OCI: ¿bajo qué circunstancias este hecho puede constituir una irregularidad auditable?",
+      "Como abogado público: ¿qué establece la Ley N° 27806 y el Código Penal sobre el secreto de la función pública?"
+    ],
+    opciones: [
+      "No hay infracción: no hubo lucro directo ni difusión pública.",
+      "Existe una falta ética menor; basta con advertencia interna y refuerzo de protocolos.",
+      "Es una infracción al deber de reserva que amerita proceso disciplinario formal.",
+      "Puede constituir delito de revelación de secretos; debe denunciarse al Ministerio Público."
+    ]
+  }
+];
+
+// =============================================
+// STORAGE
+// =============================================
+const VOTOS_KEY   = 'etica_votos_v2';
+const REFLEX_KEY  = 'etica_reflexiones_v2';
+
+function getVotos() {
+  try { return JSON.parse(localStorage.getItem(VOTOS_KEY) || '{}'); } catch { return {}; }
+}
+function getReflexiones() {
+  try { return JSON.parse(localStorage.getItem(REFLEX_KEY) || '[]'); } catch { return []; }
+}
+
+function registrarVoto(dilemaId, opcionIdx) {
+  const v = getVotos();
+  if (!v[dilemaId]) v[dilemaId] = [0,0,0,0];
+  v[dilemaId][opcionIdx]++;
+  localStorage.setItem(VOTOS_KEY, JSON.stringify(v));
+}
+
+function registrarReflexion(obj) {
+  const r = getReflexiones();
+  r.push(obj);
+  localStorage.setItem(REFLEX_KEY, JSON.stringify(r));
+}
+
+// =============================================
+// ESTADO
+// =============================================
+let estado = { nombre:'', rolIdx:null, dilemaIdx:null, opcionIdx:null, votado:false };
+let panelDilemaActivo = 0;
+
+// =============================================
+// NAVEGACIÓN ESTUDIANTE
+// =============================================
+const pasos = ['screen-1','screen-2','screen-3','screen-4','screen-5','screen-6'];
+function irAScreen(id) {
+  pasos.forEach(p => { const el = document.getElementById(p); if(el) el.classList.remove('active'); });
+  const target = document.getElementById(id);
+  if(target) target.classList.add('active');
+  const idx = pasos.indexOf(id);
+  document.getElementById('progressFill').style.width = ((idx / (pasos.length-1)) * 100) + '%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function irA2() {
+  const n = document.getElementById('inputNombre').value.trim();
+  if (!n) { showToast('Escribe tu nombre o alias para continuar'); return; }
+  estado.nombre = n;
+  renderRoles();
+  irAScreen('screen-2');
+}
+function irA3() { if (estado.rolIdx === null) return; renderDilemas(); irAScreen('screen-3'); }
+function irA4() { if (estado.dilemaIdx === null) return; renderVoto(); irAScreen('screen-4'); }
+
+// =============================================
+// RENDER ESTUDIANTE
+// =============================================
+function renderRoles() {
+  document.getElementById('roleGrid').innerHTML = roles.map((r,i) => `
+    <div class="role-card ${estado.rolIdx===i?'selected':''}" onclick="selectRol(${i})">
+      <span class="role-icon">${r.icono}</span>
+      <div class="role-name">${r.nombre}</div>
+      <div class="role-desc-short">${r.desc}</div>
+    </div>`).join('');
+}
+function selectRol(i) {
+  estado.rolIdx = i; renderRoles();
+  document.getElementById('btnRol').disabled = false;
+}
+
+function renderDilemas() {
+  document.getElementById('dilemaList').innerHTML = dilemas.map((d,i) => `
+    <div class="dilema-item ${estado.dilemaIdx===i?'selected':''}" onclick="selectDilema(${i})">
+      <div class="dilema-num-bubble">${d.num}</div>
+      <div>
+        <div class="dilema-item-title">${d.titulo}</div>
+        <div class="dilema-item-hint">${d.tensiones.map(t=>t.t).join(' · ')}</div>
+      </div>
+    </div>`).join('');
+}
+function selectDilema(i) {
+  estado.dilemaIdx = i; renderDilemas();
+  document.getElementById('btnDilema').disabled = false;
+}
+
+function renderVoto() {
+  const d = dilemas[estado.dilemaIdx];
+  const r = roles[estado.rolIdx];
+  document.getElementById('rolBadgeActivo').innerHTML = `${r.icono} ${r.nombre}`;
+  document.getElementById('dilemaBoxActivo').innerHTML = `
+    <div class="dilema-box-header">
+      <div class="dilema-box-num">${d.num}</div>
+      <div class="dilema-box-title">${d.titulo}</div>
+    </div>
+    <p class="dilema-box-text">${d.contexto}</p>
+    <div class="tension-tags">${d.tensiones.map(t=>`<span class="tag tag-${t.c}">${t.t}</span>`).join('')}</div>`;
+  document.getElementById('preguntaGuia').textContent = d.preguntasPorRol[estado.rolIdx];
+  const letras=['A','B','C','D'];
+  document.getElementById('opcionesVoto').innerHTML = d.opciones.map((op,i) => `
+    <button class="opcion-btn ${estado.opcionIdx===i?'voted':''}" onclick="selectOpcion(${i})">
+      <span class="opcion-letter">${letras[i]}</span><span>${op}</span>
+    </button>`).join('');
+}
+function selectOpcion(i) {
+  estado.opcionIdx = i;
+  document.querySelectorAll('.opcion-btn').forEach((b,idx) => b.classList.toggle('voted', idx===i));
+  document.getElementById('btnVotar').disabled = false;
+}
+
+function emitirVoto() {
+  if (estado.votado || estado.opcionIdx === null) return;
+  registrarVoto(dilemas[estado.dilemaIdx].id, estado.opcionIdx);
+  estado.votado = true;
+  renderResultadosEstudiante();
+  irAScreen('screen-5');
+}
+
+function renderResultadosEstudiante() {
+  const d = dilemas[estado.dilemaIdx];
+  const votos = getVotos()[d.id] || [0,0,0,0];
+  const total = votos.reduce((a,b)=>a+b,0);
+  const letras=['A','B','C','D'];
+  const maxV = Math.max(...votos);
+  document.getElementById('totalVotesText').textContent = `${total} voto${total!==1?'s':''} registrado${total!==1?'s':''} en esta sesión`;
+  document.getElementById('resultadosBarras').innerHTML = buildBars(d.opciones, votos, total, letras, maxV);
+}
+
+function buildBars(opciones, votos, total, letras, maxV) {
+  return opciones.map((op,i) => {
+    const pct = total>0 ? Math.round((votos[i]/total)*100) : 0;
+    const isWin = votos[i]===maxV && maxV>0;
+    return `<div class="result-bar-wrap">
+      <div class="result-label">
+        <span class="result-label-text"><strong>${letras[i]}.</strong> ${op.substring(0,65)}${op.length>65?'…':''}</span>
+        <div style="display:flex;align-items:center;gap:4px;">
+          ${isWin && total>0 ? '<span class="result-winner">↑ Mayor</span>' : ''}
+          <span class="result-pct">${pct}%</span>
+        </div>
+      </div>
+      <div class="result-bar-track ${isWin?'winner-track':''}">
+        <div class="result-bar-fill ${isWin?'winner':''}" style="width:${pct}%"></div>
+      </div>
+      <div class="result-count">${votos[i]} voto${votos[i]!==1?'s':''}</div>
+    </div>`;
+  }).join('');
+}
+
+function enviarReflexion() {
+  const txt = document.getElementById('reflexionText').value.trim();
+  if (!txt || txt.length < 10) { showToast('Escribe al menos una oración de reflexión'); return; }
+  const d = dilemas[estado.dilemaIdx];
+  const r = roles[estado.rolIdx];
+  const letras=['A','B','C','D'];
+  registrarReflexion({
+    nombre: estado.nombre,
+    rol: r.nombre,
+    rolIcon: r.icono,
+    dilemaId: d.id,
+    dilemaTitulo: d.titulo,
+    opcionIdx: estado.opcionIdx,
+    opcionTexto: d.opciones[estado.opcionIdx],
+    reflexion: txt,
+    ts: Date.now()
+  });
+  document.getElementById('resumenParticipacion').innerHTML = `
+    <div class="info-row"><span class="info-key">Participante</span><span class="info-val">${estado.nombre}</span></div>
+    <div class="info-row"><span class="info-key">Rol</span><span class="info-val">${r.icono} ${r.nombre}</span></div>
+    <div class="info-row"><span class="info-key">Dilema</span><span class="info-val">${d.titulo}</span></div>
+    <div class="info-row"><span class="info-key">Decisión</span><span class="info-val">Opción ${letras[estado.opcionIdx]}</span></div>
+    <div class="info-row" style="flex-direction:column;gap:4px;"><span class="info-key">Reflexión</span><span class="info-val" style="font-weight:400;font-size:13px;line-height:1.6;">${txt}</span></div>`;
+  const votos = getVotos()[d.id]||[0,0,0,0];
+  const total = votos.reduce((a,b)=>a+b,0);
+  document.getElementById('totalVotesFinalText').textContent = `${total} voto${total!==1?'s':''} totales en el grupo`;
+  document.getElementById('resultadosFinales').innerHTML = document.getElementById('resultadosBarras').innerHTML;
+  irAScreen('screen-6');
+  showToast('Participación registrada');
+}
+
+// =============================================
+// MODAL DOCENTE
+// =============================================
+function abrirModalDocente() {
+  document.getElementById('modalDocente').style.display = 'flex';
+  document.getElementById('passInput').value = '';
+  document.getElementById('passError').textContent = '';
+  setTimeout(() => document.getElementById('passInput').focus(), 100);
+}
+function cerrarModal() {
+  document.getElementById('modalDocente').style.display = 'none';
+}
+function verificarPass() {
+  const v = document.getElementById('passInput').value;
+  if (v === PASS_DOCENTE) {
+    cerrarModal();
+    abrirPanelDocente();
+  } else {
+    document.getElementById('passError').textContent = 'Contraseña incorrecta. Inténtalo de nuevo.';
+    document.getElementById('passInput').value = '';
+    document.getElementById('passInput').focus();
+  }
+}
+document.getElementById('passInput').addEventListener('keydown', e => { if(e.key==='Enter') verificarPass(); });
+
+// =============================================
+// PANEL DOCENTE
+// =============================================
+function abrirPanelDocente() {
+  document.getElementById('vistaEstudiante').style.display = 'none';
+  document.getElementById('topBar').style.display = 'none';
+  document.getElementById('progressFill').parentElement.style.display = 'none';
+  document.getElementById('panelDocente').classList.add('active');
+  actualizarPanel();
+}
+
+function cerrarPanelDocente() {
+  document.getElementById('vistaEstudiante').style.display = 'block';
+  document.getElementById('topBar').style.display = 'flex';
+  document.getElementById('progressFill').parentElement.style.display = 'block';
+  document.getElementById('panelDocente').classList.remove('active');
+}
+
+function actualizarPanel() {
+  const votos = getVotos();
+  const reflexiones = getReflexiones();
+
+  // Stats
+  const nombres = [...new Set(reflexiones.map(r=>r.nombre))];
+  let totalVotos = 0;
+  Object.values(votos).forEach(arr => arr.forEach(v => totalVotos += v));
+  document.getElementById('statParticipantes').textContent = nombres.length;
+  document.getElementById('statVotos').textContent = totalVotos;
+  document.getElementById('statReflexiones').textContent = reflexiones.length;
+
+  // Dilema más activo
+  let maxD = '—', maxDV = 0;
+  dilemas.forEach(d => {
+    const arr = votos[d.id]||[0,0,0,0];
+    const t = arr.reduce((a,b)=>a+b,0);
+    if (t > maxDV) { maxDV = t; maxD = d.num; }
+  });
+  document.getElementById('statDilemaActivo').textContent = maxD === '—' ? '—' : 'D'+maxD;
+
+  // Tabs dilemas
+  document.getElementById('dilemaTabs').innerHTML = dilemas.map((d,i) => {
+    const arr = votos[d.id]||[0,0,0,0];
+    const t = arr.reduce((a,b)=>a+b,0);
+    return `<button class="dtab ${panelDilemaActivo===i?'active':''}" onclick="seleccionarPanelDilema(${i})">${d.titulo} (${t})</button>`;
+  }).join('');
+
+  renderPanelDilema();
+  poblarFiltroRoles(reflexiones);
+  renderReflexiones();
+}
+
+function seleccionarPanelDilema(i) {
+  panelDilemaActivo = i;
+  actualizarPanel();
+}
+
+function renderPanelDilema() {
+  const d = dilemas[panelDilemaActivo];
+  const votos = getVotos()[d.id]||[0,0,0,0];
+  const total = votos.reduce((a,b)=>a+b,0);
+  const letras=['A','B','C','D'];
+  const maxV = Math.max(...votos);
+  document.getElementById('panelDilemaTitle').textContent = d.titulo;
+  document.getElementById('panelDilemaSub').textContent = `${total} voto${total!==1?'s':''} registrados`;
+  document.getElementById('panelResultBars').innerHTML = total === 0
+    ? `<div class="empty-state"><div class="empty-icon">🗳️</div>Aún no hay votos en este dilema.</div>`
+    : buildBars(d.opciones, votos, total, letras, maxV);
+}
+
+function poblarFiltroRoles(reflexiones) {
+  const rolesUsados = [...new Set(reflexiones.map(r=>r.rol))];
+  const sel = document.getElementById('filtroRol');
+  const val = sel.value;
+  sel.innerHTML = '<option value="">Todos los roles</option>' +
+    rolesUsados.map(r => `<option value="${r}" ${val===r?'selected':''}>${r}</option>`).join('');
+}
+
+function renderReflexiones() {
+  const d = dilemas[panelDilemaActivo];
+  let lista = getReflexiones().filter(r => r.dilemaId === d.id);
+
+  const filtRol = document.getElementById('filtroRol').value;
+  const filtOp  = document.getElementById('filtroOpcion').value;
+  if (filtRol) lista = lista.filter(r => r.rol === filtRol);
+  if (filtOp !== '') lista = lista.filter(r => r.opcionIdx === parseInt(filtOp));
+
+  const letras=['A','B','C','D'];
+  document.getElementById('reflexionesSub').textContent = `${lista.length} reflexión${lista.length!==1?'es':''} para "${d.titulo}"`;
+
+  if (lista.length === 0) {
+    document.getElementById('panelReflexiones').innerHTML =
+      `<div class="empty-state"><div class="empty-icon">✍️</div>Aún no hay reflexiones registradas para este dilema${filtRol||filtOp!==''?' con este filtro.':'.'}.</div>`;
+    return;
+  }
+
+  document.getElementById('panelReflexiones').innerHTML = lista
+    .sort((a,b) => b.ts - a.ts)
+    .map(r => `
+      <div class="reflexion-card">
+        <div class="ref-header">
+          <span class="ref-name">${r.rolIcon} ${r.nombre}</span>
+          <span class="ref-rol">${r.rol}</span>
+          <span class="ref-opcion">Opción ${letras[r.opcionIdx]}</span>
+        </div>
+        <div class="ref-text">"${r.reflexion}"</div>
+        <div style="margin-top:6px;font-size:11px;color:#aaa;">${new Date(r.ts).toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'})}</div>
+      </div>`).join('');
+}
+
+function resetearSesion() {
+  if (!confirm('¿Limpiar todos los votos y reflexiones de la sesión? Esta acción no se puede deshacer.')) return;
+  localStorage.removeItem(VOTOS_KEY);
+  localStorage.removeItem(REFLEX_KEY);
+  actualizarPanel();
+  showToast('Sesión reiniciada');
+}
+
+function mostrarExport() {
+  const card = document.getElementById('exportCard');
+  const votos = getVotos();
+  const reflex = getReflexiones();
+  const letras=['A','B','C','D'];
+  let txt = `=== SESIÓN: ÉTICA EN LA GESTIÓN PÚBLICA — UCV POSGRADO ===\n`;
+  txt += `Exportado: ${new Date().toLocaleString('es-PE')}\n\n`;
+
+  dilemas.forEach(d => {
+    const arr = votos[d.id]||[0,0,0,0];
+    const total = arr.reduce((a,b)=>a+b,0);
+    if (total === 0) return;
+    txt += `--- DILEMA ${d.num}: ${d.titulo.toUpperCase()} ---\n`;
+    txt += `Total votos: ${total}\n`;
+    d.opciones.forEach((op,i) => {
+      const pct = total>0 ? Math.round((arr[i]/total)*100) : 0;
+      txt += `  [${letras[i]}] ${pct}% (${arr[i]} votos) — ${op}\n`;
+    });
+    const rr = reflex.filter(r=>r.dilemaId===d.id);
+    if (rr.length>0) {
+      txt += `\nReflexiones (${rr.length}):\n`;
+      rr.forEach(r => {
+        txt += `  · ${r.nombre} [${r.rol}] [Op.${letras[r.opcionIdx]}]: "${r.reflexion}"\n`;
+      });
+    }
+    txt += '\n';
+  });
+
+  document.getElementById('exportArea').textContent = txt || '(No hay datos registrados aún)';
+  card.style.display = card.style.display==='none' ? 'block' : 'none';
+}
+
+function copiarExport() {
+  const txt = document.getElementById('exportArea').textContent;
+  navigator.clipboard.writeText(txt).then(() => showToast('Copiado al portapapeles'));
+}
+
+// =============================================
+// TOAST
+// =============================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+document.getElementById('inputNombre').addEventListener('keydown', e => { if(e.key==='Enter') irA2(); });
+</script>
+</body>
+</html>
