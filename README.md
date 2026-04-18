@@ -1,0 +1,2 @@
+# MaGePub
+Para uso educativo
